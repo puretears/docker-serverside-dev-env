@@ -1,0 +1,16 @@
+version: "3.6"
+
+services:
+    vapor:
+        build:
+            context: ./vapor
+        image: ${CURRENT_VAPOR_IMG}
+        ports:
+            - 8080:8080
+        volumes:
+            - ${HOST_ROOT}:${CONTAINER_ROOT}
+        working_dir: ${CONTAINER_ROOT}
+        tty: true
+        entrypoint: bash
+        networks:
+            - bx-net
