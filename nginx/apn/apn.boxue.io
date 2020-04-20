@@ -48,7 +48,7 @@ server {
     ssl_session_timeout 60m;
     ssl_session_tickets on;
 
-    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
     ssl_ciphers EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
 
     ssl_prefer_server_ciphers on;
