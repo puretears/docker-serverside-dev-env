@@ -27,10 +27,6 @@ server {
         include fastcgi_params;
     }
 
-    ssl_protocols TLSv1.2 TLSv1.1;
-    ssl_certificate     /etc/nginx/ssl/apn.boxue.io.crt;
-    ssl_certificate_key /etc/nginx/ssl/apn.boxue.io.key;
-
     location /socket.io {
         access_log /tmp/srv_socket.log;
         proxy_pass http://echo:6001;
@@ -44,6 +40,22 @@ server {
     location ~ /\.(?!well-known).* {
         deny all;
     }
+
+    ssl_certificate     /etc/nginx/ssl/apn.boxue.io.crt;
+    ssl_certificate_key /etc/nginx/ssl/apn.boxue.io.key;
+
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 60m;
+    ssl_session_tickets on;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
+
+    ssl_prefer_server_ciphers on;
+    add_header Strict-Transport-Security max-age=15768000;
+
+    resolver 8.8.8.8 8.8.4.4 valid=300s;
+    resolver_timeout 5s;
 }
 
 server {
