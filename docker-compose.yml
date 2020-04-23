@@ -6,7 +6,8 @@ services:
             context: ./nginx
             args:
               appName: ${APP_NAME}
-              appRoot: ${APP_ROOT}
+              appRootDir: ${APP_ROOT}
+              baseImg: ${BASE_IMG}
         image: ${CURRENT_NGINX_IMG}
         ports:
             - ${HOST_HTTP_PORT}:80
@@ -38,6 +39,7 @@ services:
         build:
             context: ./redis
         image: ${CURRENT_REDIS_IMG}
+        privileged: true
         ports:
             - ${HOST_REDIS_PORT}:6379 # debugging only
         networks:

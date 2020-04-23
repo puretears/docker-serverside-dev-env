@@ -1,0 +1,9 @@
+projects/*
+dbs/*
+.env
+*.bak
+apn.env
+bx.env
+*.crt
+*.key
+

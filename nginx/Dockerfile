@@ -1,41 +1,28 @@
-FROM ubuntu:18.04
+ARG baseImg=boxue/base:1.0.0
+FROM $baseImg
+
+ARG appName
+ARG appRootDir
 
 LABEL maintainer="Mars <11@boxue.io>"
-LABEL description="Docker container for server side development"
-
-ARG appName=dev.boxue.io
-ARG appRootDir=boxue
-
-RUN echo "Building Nginx for ${appName}"
+LABEL description="Nginx server of Boxue website and app backend."
 
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y nginx iputils-ping vim \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y nginx \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf \
-        && mkdir -p /etc/nginx/ssl
+ADD $appRootDir/$appName /etc/nginx/sites-available/$appName
+COPY $appRootDir/$appName.* /etc/nginx/ssl/
 
-#ADD apn/apn.boxue.io /etc/nginx/sites-available/apn.boxue.io
-#COPY apn/apn.boxue.io* /etc/nginx/ssl/
-#ADD boxue/dev.boxue.io /etc/nginx/sites-available/dev.boxue.io
-#COPY boxue/dev.boxue.io* /etc/nginx/ssl/
-
-ADD ${appRootDir}/${appName} /etc/nginx/sites-available/${appName}
-COPY ${appRootDir}/${appName}* /etc/nginx/ssl/
-
-RUN ln -sf /etc/nginx/sites-available/${appName} /etc/nginx/sites-enabled/${appName} && \
-    #ln -sf /etc/nginx/sites-available/dev.boxue.io /etc/nginx/sites-enabled/dev.boxue.io && \
+RUN ln -sf /etc/nginx/sites-available/$appName /etc/nginx/sites-enabled/$appName && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
-    mkdir -p /var/www/${appRootDir}/current && \
-    chown www-data:www-data /var/www/${appRootDir}/current
-    #mkdir -p /var/www/push-notifications/current && \
-    #chown www-data:www-data /var/www/push-notifications/current && \
-    #mkdir -p /var/www/boxue/current && \
-    #chown www-data:www-data /var/www/boxue/current
+RUN mkdir -p /var/www/$appRootDir/current && \
+    chown www-data:www-data /var/www/$appRootDir/current
 
-CMD ["nginx"]
+STOPSIGNAL SIGTERM
+
+CMD ["nginx", "-g", "daemon off;"]
 

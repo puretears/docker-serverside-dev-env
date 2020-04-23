@@ -4,6 +4,8 @@ services:
     php:
         build:
             context: ./php
+            args:
+              baseImg: ${BASE_IMG}
         image: ${CURRENT_PHP_IMG}
         ports:
             - 9000:9000

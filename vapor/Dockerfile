@@ -1,9 +1,11 @@
-FROM ubuntu:18.04
+ARG baseImg=boxue/base:1.0.0
+FROM ${baseImg} 
 
 LABEL maintainer="Mars <11@boxue.io>"
-LABEL description="Docker container for server side development."
+LABEL description="Swift Vapor environment."
 
-RUN apt-get update && apt-get install wget software-properties-common gnupg2 libcurl4-openssl-dev -y
+RUN apt-get update && \
+    apt-get install wget software-properties-common gnupg2 libcurl4-openssl-dev -y
 
 # Vapor setup
 RUN /bin/bash -c "$(wget -qO- https://apt.vapor.sh)"
