@@ -1,5 +1,5 @@
-arg baseImg
-FROM ${baseImg}
+ARG baseImg
+FROM $baseImg
 
 LABEL maintainer="Mars <11@boxue.io>"
 LABEL description="PHP FPM of Boxue website and app backend."

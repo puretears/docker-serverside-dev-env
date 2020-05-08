@@ -1,5 +1,5 @@
 ARG baseImg
-FROM ${baseImg}
+FROM $baseImg
 
 LABEL maintainer="Mars <11@boxue.io>"
 LABEL description="Redis channel that deliver event from Boxue server to clients."

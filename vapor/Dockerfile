@@ -1,5 +1,5 @@
-ARG baseImg=boxue/base:1.0.0
-FROM ${baseImg} 
+ARG baseImg
+FROM $baseImg
 
 LABEL maintainer="Mars <11@boxue.io>"
 LABEL description="Swift Vapor environment."

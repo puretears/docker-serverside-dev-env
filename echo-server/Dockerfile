@@ -1,5 +1,3 @@
-ARG baseImg
-#FROM ${baseImg}
 FROM node
 
 LABEL maintainer="Mars <11@boxue.io>"
