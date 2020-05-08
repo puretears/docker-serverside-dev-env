@@ -1,4 +1,4 @@
-ARG baseImg=boxue/base:1.0.0
+ARG baseImg
 FROM ${baseImg}
 
 LABEL maintainer="Mars <11@boxue.io>"

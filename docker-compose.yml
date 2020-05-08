@@ -38,6 +38,8 @@ services:
     redis:
         build:
             context: ./redis
+            args:
+              baseImg: ${BASE_IMG}
         image: ${CURRENT_REDIS_IMG}
         privileged: true
         ports:
@@ -48,6 +50,8 @@ services:
     echo:
         build:
             context: ./echo-server
+            args:
+              baseImg: ${BASE_IMG}
         image: ${CURRENT_ECHO_IMG}
         # We comment out the port because we forward the request
         # to echo by Nginx internally.
