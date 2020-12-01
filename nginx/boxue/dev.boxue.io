@@ -1,5 +1,5 @@
 server {
-    listen 11443 ssl http2;
+    listen 443 ssl http2;
     server_name dev.boxue.io;
 
     root /var/www/boxue/current/public;

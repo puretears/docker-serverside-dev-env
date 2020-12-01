@@ -1,5 +1,5 @@
 server {
-    listen 11443 ssl http2 default_server;
+    listen 443 ssl http2 default_server;
     server_name api.boxue.io;
 
     root /var/www/bx-api/current/public;
