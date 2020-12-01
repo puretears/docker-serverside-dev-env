@@ -1,8 +1,8 @@
 server {
     listen 443 ssl http2 default_server;
-    server_name apn.boxue.io;
+    server_name api.boxue.io;
 
-    root /var/www/push-notifications/current/public;
+    root /var/www/bx-api/current/public;
 
     index index.html index.htm index.php;
     charset utf-8;
@@ -41,8 +41,8 @@ server {
         deny all;
     }
 
-    ssl_certificate     /etc/nginx/ssl/apn.boxue.io.crt;
-    ssl_certificate_key /etc/nginx/ssl/apn.boxue.io.key;
+    ssl_certificate     /etc/nginx/ssl/api.boxue.io.crt;
+    ssl_certificate_key /etc/nginx/ssl/api.boxue.io.key;
 
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 60m;
@@ -60,6 +60,6 @@ server {
 
 server {
     listen 80;
-    server_name apn.boxue.io;
-    return 301 https://apn.boxue.io$request_uri;
+    server_name api.boxue.io;
+    return 301 https://api.boxue.io$request_uri;
 }
