@@ -1,23 +1,70 @@
 FROM ubuntu:20.04
 
 LABEL maintainer="Mars <11@boxue.io>"
-LABEL description="Base image of Boxue docker containers for server side development."
+LABEL description="Application image based on PHP."
+
+ARG WWWUSER
+ARG WWWGROUP
+
+# We don't want to persist DEBIAN_FRONTEND to the containers based on this image.
+# So we use ARG instead of ENV.
+ARG DEBIAN_FRONTEND=noninteractive
+
+ENV TZ=Asia/Shanghai
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime
+
+COPY sources.list /etc/apt/sources.list
 
 # Install Laravel dependencies
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        git \
-        zip \
-        wget \
-        curl \
-        cron \
-        unzip \
-        net-tools \
-        iputils-ping \
-        build-essential \
-        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update \
+    && apt-get install -y gnupg gosu curl ca-certificates zip unzip git \
+        supervisor sqlite3 libcap2-bin libpng-dev python2 net-tools \
+        iputils-ping
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN mkdir -p ~/.gnupg && chmod 600 ~/.gnupg \
+    && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
 
-CMD ["/bin/bash"]
+RUN apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E5267A6C \
+    && apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C300EE8C \
+    && echo "deb https://launchpad.proxy.ustclug.org/ondrej/php/ubuntu focal main" > /etc/apt/sources.list.d/ppa_ondrej_php.list
 
+RUN apt-get update \
+    && apt-get install -y php8.0-cli php8.0-fpm php8.0-dev \
+       php8.0-pgsql php8.0-sqlite3 php8.0-gd \
+       php8.0-curl php8.0-memcached \
+       php8.0-imap php8.0-mysql php8.0-mbstring \
+       php8.0-xml php8.0-zip php8.0-bcmath php8.0-soap \
+       php8.0-intl php8.0-readline \
+       php8.0-msgpack php8.0-igbinary php8.0-ldap \
+       php8.0-redis
+
+RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
+    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
+    && apt-get install -y nodejs \
+    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
+    && apt-get update \
+    && apt-get install -y yarn \
+    && apt-get install -y mysql-client \
+    && apt-get -y autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.0
+
+RUN groupadd --force -g $WWWGROUP fly
+RUN useradd -ms /bin/bash --no-user-group -g ${WWWGROUP} -u ${WWWUSER} fly
+
+COPY start-container.sh /usr/local/bin/start-container
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY php.ini /etc/php/8.0/fpm/conf.d/99-fly.ini
+COPY www.conf /etc/php/8.0/fpm/pool.d/z-fly.conf
+
+RUN touch /var/log/php8.0-fpm.log \
+    && chown fly /var/log/php8.0-fpm.log \
+    && chown fly /run/php \
+    && chmod +x /usr/local/bin/start-container
+
+EXPOSE 9000
+
+ENTRYPOINT ["start-container"]
