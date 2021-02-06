@@ -1,28 +1,29 @@
-ARG baseImg
-FROM $baseImg
-
-ARG appName
-ARG appRootDir
+FROM boxue/app:1.0.0
 
 LABEL maintainer="Mars <11@boxue.io>"
-LABEL description="Nginx server of Boxue website and app backend."
+LABEL description="Nginx server of the application."
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y nginx \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ARG WWWUSER
+ARG WWWGROUP
+ARG APP_NAME
+ARG NGINX_CONF
 
-ADD $appRootDir/$appName /etc/nginx/sites-available/$appName
-COPY $appRootDir/$appName.* /etc/nginx/ssl/
+# Install Laravel dependencies
+RUN apt-get update && apt-get install -y nginx
 
-RUN ln -sf /etc/nginx/sites-available/$appName /etc/nginx/sites-enabled/$appName && \
-    ln -sf /dev/stdout /var/log/nginx/access.log && \
-    ln -sf /dev/stderr /var/log/nginx/error.log
+COPY ${APP_NAME}/${NGINX_CONF} /etc/nginx/sites-available/${NGINX_CONF}
+COPY ${APP_NAME}/${NGINX_CONF}.* /etc/nginx/ssl/
 
-RUN mkdir -p /var/www/$appRootDir/current && \
-    chown www-data:www-data /var/www/$appRootDir/current
+RUN sed -i 's/user www-data/user fly/' /etc/nginx/nginx.conf
 
-STOPSIGNAL SIGTERM
+RUN ln -sf /etc/nginx/sites-available/${NGINX_CONF} /etc/nginx/sites-enabled/${NGINX_CONF} \
+    && mkdir -p /var/www/${APP_NAME}/current \
+    && chown ${WWWUSER}:${WWWGROUP} /var/www/${APP_NAME}/current \
+    && chown ${WWWUSER} /var/log/nginx/*
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY start-container.sh /usr/local/bin/start-container
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+RUN chmod +x /usr/local/bin/start-container
+
+ENTRYPOINT ["start-container"]
