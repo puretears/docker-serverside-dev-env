@@ -5,6 +5,7 @@ LABEL description="Application image based on PHP."
 
 ARG WWWUSER
 ARG WWWGROUP
+ARG APP_NAME
 
 # We don't want to persist DEBIAN_FRONTEND to the containers based on this image.
 # So we use ARG instead of ENV.
@@ -65,6 +66,6 @@ RUN touch /var/log/php8.0-fpm.log \
     && chown fly /run/php \
     && chmod +x /usr/local/bin/start-container
 
-EXPOSE 9000
+WORKDIR "/var/www/${APP_NAME}/current"
 
 ENTRYPOINT ["start-container"]

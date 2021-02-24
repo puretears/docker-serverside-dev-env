@@ -16,14 +16,17 @@ COPY ${APP_NAME}/${NGINX_CONF}.* /etc/nginx/ssl/
 
 RUN sed -i 's/user www-data/user fly/' /etc/nginx/nginx.conf
 
-RUN ln -sf /etc/nginx/sites-available/${NGINX_CONF} /etc/nginx/sites-enabled/${NGINX_CONF} \
-    && mkdir -p /var/www/${APP_NAME}/current \
+RUN mkdir -p /var/www/${APP_NAME}/current \
     && chown ${WWWUSER}:${WWWGROUP} /var/www/${APP_NAME}/current \
-    && chown ${WWWUSER} /var/log/nginx/*
+    && chown ${WWWUSER} /var/log/nginx/* \
+    && chown ${WWWUSER} -R /etc/nginx \
+    && ln -sf /etc/nginx/sites-available/${NGINX_CONF} /etc/nginx/sites-enabled/${NGINX_CONF}
 
 COPY start-container.sh /usr/local/bin/start-container
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN chmod +x /usr/local/bin/start-container
+
+WORKDIR /var/www/${APP_NAME}/current
 
 ENTRYPOINT ["start-container"]

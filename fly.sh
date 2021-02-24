@@ -26,7 +26,7 @@ fi
 # we have to set default values for them to ensure the whole
 # system could work properly.
 export APP_PORT=${APP_PORT:-8080}
-export APP_SERVICE=${APP_SERVICE:-"bx.app"}
+export APP_SERVICE=${APP_SERVICE:-"app"}
 export DB_PORT=${DB_PORT:-33060}
 export WWWUSER=${WWWUSER:-$UID}
 export WWWGROUP=${WWWGROUP:-$(id -g)}
