@@ -28,8 +28,8 @@ fi
 export APP_PORT=${APP_PORT:-8080}
 export APP_SERVICE=${APP_SERVICE:-"app"}
 export DB_PORT=${DB_PORT:-33060}
-export WWWUSER=${WWWUSER:-$UID}
-export WWWGROUP=${WWWGROUP:-$(id -g)}
+export WWWUSER=1000
+export WWWGROUP=1000
 
 # Ensure the docker service is working
 # 2>&1: We don't care about the details if docker haven't been
