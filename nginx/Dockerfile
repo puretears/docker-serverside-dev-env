@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y nginx
 COPY ${APP_NAME}/${NGINX_CONF} /etc/nginx/sites-available/${NGINX_CONF}
 COPY ${APP_NAME}/${NGINX_CONF}.* /etc/nginx/ssl/
 
-RUN sed -i 's/user www-data/user fly/' /etc/nginx/nginx.conf
+RUN sed -i 's/user www-data/user fly/' /etc/nginx/nginx.conf \
+    && sed -i 's/worker_processes auto/worker_processes 4/' /etc/nginx/nginx.conf
 
 RUN mkdir -p /var/www/${APP_NAME}/current \
     && chown ${WWWUSER}:${WWWGROUP} /var/www/${APP_NAME}/current \
