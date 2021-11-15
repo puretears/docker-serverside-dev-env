@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:21.10
 
 LABEL maintainer="Mars <11@boxue.io>"
 LABEL description="Application image based on PHP."
@@ -14,20 +14,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai
 RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime
 
-COPY sources.list /etc/apt/sources.list
+# COPY sources.list /etc/apt/sources.list
 
 # Install Laravel dependencies
 RUN apt-get update \
     && apt-get install -y gnupg gosu curl ca-certificates zip unzip git \
         supervisor sqlite3 libcap2-bin libpng-dev python2 net-tools \
         iputils-ping
-
-RUN mkdir -p ~/.gnupg && chmod 600 ~/.gnupg \
-    && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
-
-RUN apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E5267A6C \
-    && apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C300EE8C \
-    && echo "deb https://launchpad.proxy.ustclug.org/ondrej/php/ubuntu focal main" > /etc/apt/sources.list.d/ppa_ondrej_php.list
 
 RUN apt-get update \
     && apt-get install -y php8.0-cli php8.0-fpm php8.0-dev \
@@ -40,7 +33,7 @@ RUN apt-get update \
        php8.0-redis
 
 RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
-    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y nodejs \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \

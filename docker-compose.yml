@@ -19,7 +19,7 @@ services:
         networks:
             - fly
         depends_on:
-            - mysql
+            - mariadb
             - redis
     
     nginx:
@@ -42,22 +42,22 @@ services:
         depends_on:
             - app
 
-    mysql:
+    mariadb:
         build:
-            context: ./mysql
-        image: ${MYSQL_IMG}
-        container_name: "mysql-${APP_NAME}"
-        command: --default-authentication-plugin=mysql_native_password
+            context: ./mariadb
+        image: ${MARIADB_IMG}
+        container_name: "mariadb-${APP_NAME}"
         ports:
             - ${HOST_DB_PORT}:3306
         volumes:
             - ${DB_ROOT}:/var/lib/mysql
         environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${DB_DATABASE}
-            MYSQL_USER: ${DB_USERNAME}
-            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+            MARIADB_DATABASE: ${DB_DATABASE}
+            MARIADB_USER: ${DB_USERNAME}
+            MARIADB_PASSWORD: ${DB_PASSWORD}
             TZ: Asia/Shanghai
+            LANG: C.UTF-8
         networks:
             - fly
 
