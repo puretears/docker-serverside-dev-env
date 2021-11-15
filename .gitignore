@@ -1,9 +1,9 @@
 projects/*
 dbs/*
-.env
+*.env
 *.bak
-apn.env
-bx.env
 *.crt
 *.key
+.DS_Store
+octoape/
 
