@@ -38,7 +38,7 @@ RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-di
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
     && apt-get update \
-    && apt-get install -y yarn mysql-client autoremove clean \
+    && apt-get install -y yarn mysql-client \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.0
@@ -46,16 +46,13 @@ RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.0
 RUN groupadd --force -g $WWWGROUP fly
 RUN useradd -ms /bin/bash --no-user-group -g ${WWWGROUP} -u ${WWWUSER} fly
 
-COPY start-container.sh /usr/local/bin/start-container
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY php.ini /etc/php/8.0/fpm/conf.d/99-fly.ini
 COPY www.conf /etc/php/8.0/fpm/pool.d/z-fly.conf
 
 RUN touch /var/log/php8.0-fpm.log \
     && chown fly /var/log/php8.0-fpm.log \
-    && chown fly /run/php \
-    && chmod +x /usr/local/bin/start-container
+    && chown fly /run/php
 
 WORKDIR "/var/www/${APP_NAME}/current"
 
-ENTRYPOINT ["start-container"]
+CMD ["php-fpm8.0", "-F"]

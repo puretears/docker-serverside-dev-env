@@ -8,6 +8,9 @@ ARG WWWGROUP
 ARG APP_NAME
 ARG NGINX_CONF
 
+ENV TZ=Asia/Shanghai
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime
+
 # Install Laravel dependencies
 RUN apt-get update && apt-get install -y nginx
 
