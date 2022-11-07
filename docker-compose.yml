@@ -21,7 +21,7 @@ services:
         depends_on:
             - mariadb
             - redis
-    
+
     nginx:
         build:
             context: ./nginx
@@ -69,18 +69,6 @@ services:
         privileged: true
         ports:
             - ${HOST_REDIS_PORT}:6379 # debugging only
-        networks:
-            - fly
-
-    echo:
-        build:
-            context: ./echo-server
-        image: ${ECHO_IMG}
-        container_name: "echo-${APP_NAME}"
-        # We comment out the port because we forward the request
-        # to echo by Nginx internally.
-        #ports:
-        #    - ${HOST_ECHO_PORT}:6001 # debugging only
         networks:
             - fly
 

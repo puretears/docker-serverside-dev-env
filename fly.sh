@@ -31,6 +31,11 @@ export DB_PORT=${DB_PORT:-33060}
 export WWWUSER=1000
 export WWWGROUP=1000
 
+export APP_IMG=boxue/app:1.3.1
+export MARIADB_IMG=boxue/mariadb:1.0.0
+export NGINX_IMG=boxue/nginx:1.2.0
+export REDIS_IMG=boxue/redis:1.0.0
+
 # Ensure the docker service is working
 # 2>&1: We don't care about the details if docker haven't been
 # started yet. The $? is enough.

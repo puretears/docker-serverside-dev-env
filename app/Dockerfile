@@ -1,4 +1,4 @@
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 
 LABEL maintainer="Mars <11@boxue.io>"
 LABEL description="Application image based on PHP."
@@ -14,8 +14,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai
 RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime
 
-# COPY sources.list /etc/apt/sources.list
-
 # Install Laravel dependencies
 RUN apt-get update \
     && apt-get install -y gnupg gosu curl ca-certificates zip unzip git \
@@ -23,36 +21,33 @@ RUN apt-get update \
         iputils-ping
 
 RUN apt-get update \
-    && apt-get install -y php8.0-cli php8.0-fpm php8.0-dev \
-       php8.0-pgsql php8.0-sqlite3 php8.0-gd \
-       php8.0-curl php8.0-memcached \
-       php8.0-imap php8.0-mysql php8.0-mbstring \
-       php8.0-xml php8.0-zip php8.0-bcmath php8.0-soap \
-       php8.0-intl php8.0-readline \
-       php8.0-msgpack php8.0-igbinary php8.0-ldap \
-       php8.0-redis
-
-RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
-    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y nodejs \
-    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
-    && apt-get update \
-    && apt-get install -y yarn mysql-client \
+    && apt-get install -y php-cli php-fpm php-dev \
+       php-pgsql php-sqlite3 php-gd \
+       php-curl php-memcached \
+       php-imap php-mysql php-mbstring \
+       php-xml php-zip php-bcmath php-soap \
+       php-intl php-readline \
+       php-msgpack php-igbinary php-ldap \
+       php-redis mysql-client
+       
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && php -r "unlink('composer-setup.php');" \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x  \
+    && apt-get install -y nodejs npm \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.0
 
 RUN groupadd --force -g $WWWGROUP fly
 RUN useradd -ms /bin/bash --no-user-group -g ${WWWGROUP} -u ${WWWUSER} fly
 
-COPY php.ini /etc/php/8.0/fpm/conf.d/99-fly.ini
-COPY www.conf /etc/php/8.0/fpm/pool.d/z-fly.conf
+COPY php.ini /etc/php/8.1/fpm/conf.d/99-fly.ini
+COPY www.conf /etc/php/8.1/fpm/pool.d/z-fly.conf
 
-RUN touch /var/log/php8.0-fpm.log \
-    && chown fly /var/log/php8.0-fpm.log \
+RUN touch /var/log/php-fpm.log \
+    && chown fly /var/log/php-fpm.log \
     && chown fly /run/php
 
 WORKDIR "/var/www/${APP_NAME}/current"
 
-CMD ["php-fpm8.0", "-F"]
+CMD ["php-fpm8.1", "-F"]
